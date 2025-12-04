@@ -2,7 +2,9 @@ from typing import List
 from models.base import Base, str_255
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import Integer, String, Enum, text, ForeignKey, CHAR
-from enum import Enum as PyEnum
+from enum import (
+    Enum as PyEnum,
+)  # We use PyEnum as alias since sqlalchemy also has Enum as a type
 
 
 class Status(PyEnum):
@@ -22,6 +24,7 @@ class User(Base):
     )
 
     posts: Mapped[List["Post"]] = relationship("Post", back_populates="user")  # type: ignore
+    # We want a one-way relationship so we do not need back_populates here
     passport: Mapped["Passport"] = relationship()
 
 
@@ -29,4 +32,5 @@ class Passport(Base):
     __tablename__ = "passports"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    # Create a one-to-one between users and passports
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), unique=True)
